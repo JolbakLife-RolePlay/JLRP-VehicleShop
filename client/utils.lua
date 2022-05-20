@@ -24,6 +24,10 @@ function TextUI(type, reason, extra)
             lib.showTextUI(message, {position = 'left-center', style = {backgroundColor = '#020040', color = white, borderColor = '#d90000', borderWidth = 2}})
         end
     elseif type == 'hide' then
-        lib.hideTextUI()
+        if Config.TextUI == 'jlrp' or Config.TextUI == 'esx' then
+            Core.HideUI()
+        elseif Config.TextUI == 'ox_lib' then
+            lib.hideTextUI()
+        end
     end
 end
