@@ -1,4 +1,4 @@
-local points, vehicles, categories, currentDisplayVehicle, CurrentVehicleData = {}, {}, {}
+local points, vehicles, categories = {}, {}, {}
 local RESOURCENAME = GetCurrentResourceName()
 local isInShopMenu = false
 do
@@ -131,46 +131,9 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
         end
 	end
     
-    --[[
-    for k, v in pairs(vehiclesByCategory) do
-        local category = k
-		for c = 1, #categories, 1 do
-            if categories[c] == category then
-                category = categories[c]
-                local categoryVehicles = vehiclesByCategory[category.name]
-                local options = {}
-            
-                for j = 1, #categoryVehicles, 1 do
-                    local vehicle = categoryVehicles[j]
-                    if not isFirstvehicleDataSet then
-                        firstVehicleData = vehicle
-                        isFirstvehicleDataSet = true
-                    end
-                
-                    table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _Locale('money_currency', Core.Math.GroupDigits(vehicle.price))))
-                end
-
-                table.sort(options)
-
-                table.insert(elements, {
-                    name    = category.name,
-                    label   = category.label,
-                    value   = 0,
-                    type    = 'slider',
-                    max     = #categories[c],
-                    options = options
-                })
-                break
-            end
-        end
-	end
-    ]]
-
-    print(Core.Table.Dump(vehiclesByCategory))
-    
     local playerPed = PlayerPedId()
 
-	--FreezeEntityPosition(playerPed, true)
+	FreezeEntityPosition(playerPed, true)
 	SetEntityVisible(playerPed, false)
 	SetEntityCoords(playerPed, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z))
 
@@ -196,7 +159,7 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
                         isInShopMenu = false
                         menu2.close()
                         menu.close()
-                        DeleteDisplayVehicleInsideShop()
+                        DeleteDisplayVehicle()
                         
                         Core.Game.SpawnVehicle(vehicleData.model, Config.Zones.ShopOutside.Pos, Config.Zones.ShopOutside.Heading, function(vehicle)
                             TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
@@ -219,33 +182,31 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
 		end)
 	end, function(data, menu)
 		menu.close()
-		DeleteDisplayVehicleInsideShop()
+		DeleteDisplayVehicle()
 		local playerPed = PlayerPedId()
 
 		FreezeEntityPosition(playerPed, false)
 		SetEntityVisible(playerPed, true)
-		SetEntityCoords(playerPed, Config.Zones.ShopEntering.Pos)
+		SetEntityCoords(playerPed, vec(markerPosition.x, markerPosition.y, markerPosition.z))
 
 		isInShopMenu = false
 	end, function(data, menu)
 		local vehicleData = vehiclesByCategory[data.current.name][data.current.value + 1]
 		local playerPed = PlayerPedId()
 
-		DeleteDisplayVehicleInsideShop()
+		DeleteDisplayVehicle()
 		WaitForVehicleToLoad(vehicleData.model)
 
-		Core.Game.SpawnLocalVehicle(firstVehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
-            currentDisplayVehicle = vehicle
+		Core.Game.SpawnLocalVehicle(vehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
             TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
             FreezeEntityPosition(vehicle, true)
         end)
 	end)
 
-	DeleteDisplayVehicleInsideShop()
+	DeleteDisplayVehicle()
 	WaitForVehicleToLoad(firstVehicleData.model)
 
 	Core.Game.SpawnLocalVehicle(firstVehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
-		currentDisplayVehicle = vehicle
 		TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
 		FreezeEntityPosition(vehicle, true)
 	end)
@@ -261,18 +222,16 @@ function StartShopRestriction()
 	end)
 end
 
-function WaitForVehicleToLoad(modelHash)
-    print(modelHash)
-	modelHash = GetHashKey(modelHash)
-    print(modelHash)
-
-	if not HasModelLoaded(modelHash) then
+function WaitForVehicleToLoad(model)
+	--local modelHash = GetHashKey(model)
+    RequestModel(model)
+	if not HasModelLoaded(model) then
         DisableKeymanager(true)
 		BeginTextCommandBusyspinnerOn('STRING')
 		AddTextComponentSubstringPlayerName(_Locale('awaiting_model'))
 		EndTextCommandBusyspinnerOn(4)
 
-		while not HasModelLoaded(modelHash) do
+		while not HasModelLoaded(model) do
 			Wait(0)
 			DisableAllControlActions(0)
 		end
@@ -281,18 +240,9 @@ function WaitForVehicleToLoad(modelHash)
 	end
 end
 
-function DeleteDisplayVehicleInsideShop()
-	local attempt = 0
-
-	if currentDisplayVehicle and DoesEntityExist(currentDisplayVehicle) then
-		while DoesEntityExist(currentDisplayVehicle) and not NetworkHasControlOfEntity(currentDisplayVehicle) and attempt < 100 do
-			Wait(100)
-			NetworkRequestControlOfEntity(currentDisplayVehicle)
-			attempt += 1
-		end
-
-		if DoesEntityExist(currentDisplayVehicle) and NetworkHasControlOfEntity(currentDisplayVehicle) then
-			Core.Game.DeleteVehicle(currentDisplayVehicle)
-		end
-	end
+function DeleteDisplayVehicle()
+    local vehicle = GetVehiclePedIsIn(PlayerPedId())
+    if DoesEntityExist(vehicle) then
+        Core.Game.DeleteVehicle(vehicle)
+    end
 end
