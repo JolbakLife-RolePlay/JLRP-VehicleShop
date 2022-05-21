@@ -11,7 +11,6 @@ description 'JolbakLifeRP Vehicle Shop'
 version '0.0'
 
 shared_scripts {
-    '@JLRP-Framework/imports.lua',
 	'@JLRP-Framework/shared/locale.lua',
 	'@ox_lib/init.lua',
 	'locales/*.lua',
@@ -20,12 +19,12 @@ shared_scripts {
 
 server_scripts {
 	'@oxmysql/lib/MySQL.lua',
+	'server/utils.lua',
     'server/main.lua'
 }
 
 client_scripts {
 	'@PolyZone/client.lua',
-	'@PolyZone/BoxZone.lua',
 	'@PolyZone/CircleZone.lua',
 	'client/utils.lua',
 	'client/main.lua'

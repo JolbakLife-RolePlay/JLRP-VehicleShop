@@ -1,10 +1,13 @@
-local points, vehicles, categories = {}, {}, {}
+local points, vehicles, categories, currentDisplayVehicle, CurrentVehicleData = {}, {}, {}
 local RESOURCENAME = GetCurrentResourceName()
 local isInShopMenu = false
 do
+    while Core == nil do Wait(100) end
     for k, v in pairs(Config.Zones.ShopEntering) do
+
+        local marker = vec(v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z)
         if v.Blip and v.Blip == true then
-            local blip = AddBlipForCoord(v.Position)
+            local blip = AddBlipForCoord(marker)
 
             SetBlipSprite (blip, v.BlipType or 326)
             SetBlipDisplay(blip, 2)
@@ -16,9 +19,9 @@ do
             EndTextCommandSetBlipName(blip)
         end
 
-        local x, y, z = table.unpack(v.Position)
+        
 
-        local zone = CircleZone:Create(v.Position, v.DrawDistace and (v.DrawDistace + 0.0) or 20.0, {
+        local zone = CircleZone:Create(marker, v.MarkerDrawDistance and (v.MarkerDrawDistance + 0.0) or 20.0, {
             name = RESOURCENAME..":CircleZone:"..k,
             useZ = true,
             debugPoly = false
@@ -31,14 +34,14 @@ do
                     local isTextUIShown = false
                     while points[zone].isInZone do
                         Wait(0)        
-                        DrawMarker(v.MarkerType or 36, x, y, z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.Size.x or 1.5, v.Size.y or 1.5, v.Size.z or 1.5, v.RGB.r or 255, v.RGB.g or 255, v.RGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        DrawMarker(v.MarkerType or 36, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x or 1.5, v.MarkerSize.y or 1.5, v.MarkerSize.z or 1.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
                         if #(PolyZone.getPlayerPosition() - points[zone].point) <= 1.0 then
                             if not isTextUIShown then
                                 TextUI('show', 'open_shop', {shop_name = v.ShopName})
                                 isTextUIShown = true
                             end
-                            if IsControlJustReleased(0, 38) and Framework.PlayerData.dead == false then
-                                OpenMenu(v.Type)
+                            if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
+                                OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition)
                             end
                         else                        
                             if isTextUIShown then
@@ -53,20 +56,21 @@ do
     end
 end
 
-function OpenMenu(categoriesToShow)
-    Framework.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
+function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition)
+    Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
 		vehicles = result.vehicles
         categories = result.categories
 	end)
     Wait(500)
     
-    IsInShopMenu = true
+    isInShopMenu = true
     StartShopRestriction()
-	Framework.UI.Menu.CloseAll()
+	Core.UI.Menu.CloseAll()
 
     local vehiclesByCategory = {}
 	local elements = {}
 	local firstVehicleData = nil
+    local isFirstvehicleDataSet = false
 
     
 
@@ -96,21 +100,22 @@ function OpenMenu(categoriesToShow)
 			return a.name < b.name
 		end)
 	end
-
+    
     for i = 1, #categories, 1 do
         local category = categories[i]
         if vehiclesByCategory[category.name] then
             local categoryVehicles = vehiclesByCategory[category.name]
-            local options          = {}
+            local options = {}
 
             for j = 1, #categoryVehicles, 1 do
                 local vehicle = categoryVehicles[j]
 
-                if i == 1 and j == 1 then
+                if not isFirstvehicleDataSet then
                     firstVehicleData = vehicle
+                    isFirstvehicleDataSet = true
                 end
 
-                table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _Locale('money_currency', Framework.Math.GroupDigits(vehicle.price))))
+                table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _Locale('money_currency', Core.Math.GroupDigits(vehicle.price))))
             end
 
             table.sort(options)
@@ -126,12 +131,129 @@ function OpenMenu(categoriesToShow)
         end
 	end
     
-    print(Framework.Table.Dump(vehiclesByCategory))
+    --[[
+    for k, v in pairs(vehiclesByCategory) do
+        local category = k
+		for c = 1, #categories, 1 do
+            if categories[c] == category then
+                category = categories[c]
+                local categoryVehicles = vehiclesByCategory[category.name]
+                local options = {}
+            
+                for j = 1, #categoryVehicles, 1 do
+                    local vehicle = categoryVehicles[j]
+                    if not isFirstvehicleDataSet then
+                        firstVehicleData = vehicle
+                        isFirstvehicleDataSet = true
+                    end
+                
+                    table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _Locale('money_currency', Core.Math.GroupDigits(vehicle.price))))
+                end
+
+                table.sort(options)
+
+                table.insert(elements, {
+                    name    = category.name,
+                    label   = category.label,
+                    value   = 0,
+                    type    = 'slider',
+                    max     = #categories[c],
+                    options = options
+                })
+                break
+            end
+        end
+	end
+    ]]
+
+    print(Core.Table.Dump(vehiclesByCategory))
+    
+    local playerPed = PlayerPedId()
+
+	--FreezeEntityPosition(playerPed, true)
+	SetEntityVisible(playerPed, false)
+	SetEntityCoords(playerPed, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z))
+
+    Core.UI.Menu.Open('default', RESOURCENAME, 'vehicle_shop', {
+		title    = shopName,
+		align    = Config.MenuAlignment,
+		elements = elements
+	}, function(data, menu)
+		local vehicleData = vehiclesByCategory[data.current.name][data.current.value + 1]
+
+		Core.UI.Menu.Open('default', RESOURCENAME, 'shop_confirm', {
+			title = _Locale('buy_vehicle_shop', vehicleData.name, Core.Math.GroupDigits(vehicleData.price)),
+			align = Config.MenuAlignment,
+			elements = {
+				{label = _Locale('no'),  value = 'no'},
+				{label = _Locale('yes'), value = 'yes'}
+		}}, function(data2, menu2)
+			if data2.current.value == 'yes' then
+                --[[
+                local generatedPlate = GeneratePlate()
+                Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(success)
+                    if success then
+                        isInShopMenu = false
+                        menu2.close()
+                        menu.close()
+                        DeleteDisplayVehicleInsideShop()
+                        
+                        Core.Game.SpawnVehicle(vehicleData.model, Config.Zones.ShopOutside.Pos, Config.Zones.ShopOutside.Heading, function(vehicle)
+                            TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+                            SetVehicleNumberPlateText(vehicle, generatedPlate)
+                            FreezeEntityPosition(playerPed, false)
+                            SetEntityVisible(playerPed, true)
+                        end)
+
+                        Notification('success', _Locale('purchase_successful', vehicleData.name, generatedPlate), {shop_name = shopName})
+                    else
+                        Notification('error', _Locale('not_enough_money'), {shop_name = shopName})
+                    end
+                end, vehicleData.model, generatedPlate)
+                ]]
+			else
+				menu2.close()
+			end
+		end, function(data2, menu2)
+			menu2.close()
+		end)
+	end, function(data, menu)
+		menu.close()
+		DeleteDisplayVehicleInsideShop()
+		local playerPed = PlayerPedId()
+
+		FreezeEntityPosition(playerPed, false)
+		SetEntityVisible(playerPed, true)
+		SetEntityCoords(playerPed, Config.Zones.ShopEntering.Pos)
+
+		isInShopMenu = false
+	end, function(data, menu)
+		local vehicleData = vehiclesByCategory[data.current.name][data.current.value + 1]
+		local playerPed = PlayerPedId()
+
+		DeleteDisplayVehicleInsideShop()
+		WaitForVehicleToLoad(vehicleData.model)
+
+		Core.Game.SpawnLocalVehicle(firstVehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
+            currentDisplayVehicle = vehicle
+            TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+            FreezeEntityPosition(vehicle, true)
+        end)
+	end)
+
+	DeleteDisplayVehicleInsideShop()
+	WaitForVehicleToLoad(firstVehicleData.model)
+
+	Core.Game.SpawnLocalVehicle(firstVehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
+		currentDisplayVehicle = vehicle
+		TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+		FreezeEntityPosition(vehicle, true)
+	end)
 end
 
 function StartShopRestriction()
 	CreateThread(function()
-		while IsInShopMenu do
+		while isInShopMenu do
 			Wait(0)
 			DisableControlAction(0, 75,  true) -- Disable exit vehicle
 			DisableControlAction(27, 75, true) -- Disable exit vehicle
@@ -139,13 +261,38 @@ function StartShopRestriction()
 	end)
 end
 
-RegisterNetEvent('JLRP-VehicleShop:syncVehicles')
-AddEventHandler('JLRP-VehicleShop:syncVehicles', function(vehicles)
-	vehicles = vehicles
-end)
+function WaitForVehicleToLoad(modelHash)
+    print(modelHash)
+	modelHash = GetHashKey(modelHash)
+    print(modelHash)
 
-RegisterNetEvent('JLRP-VehicleShop:syncCategories')
-AddEventHandler('JLRP-VehicleShop:syncCategories', function(categories)
-	categories = categories
-end)
+	if not HasModelLoaded(modelHash) then
+        DisableKeymanager(true)
+		BeginTextCommandBusyspinnerOn('STRING')
+		AddTextComponentSubstringPlayerName(_Locale('awaiting_model'))
+		EndTextCommandBusyspinnerOn(4)
 
+		while not HasModelLoaded(modelHash) do
+			Wait(0)
+			DisableAllControlActions(0)
+		end
+		BusyspinnerOff()
+        DisableKeymanager(false)
+	end
+end
+
+function DeleteDisplayVehicleInsideShop()
+	local attempt = 0
+
+	if currentDisplayVehicle and DoesEntityExist(currentDisplayVehicle) then
+		while DoesEntityExist(currentDisplayVehicle) and not NetworkHasControlOfEntity(currentDisplayVehicle) and attempt < 100 do
+			Wait(100)
+			NetworkRequestControlOfEntity(currentDisplayVehicle)
+			attempt += 1
+		end
+
+		if DoesEntityExist(currentDisplayVehicle) and NetworkHasControlOfEntity(currentDisplayVehicle) then
+			Core.Game.DeleteVehicle(currentDisplayVehicle)
+		end
+	end
+end
