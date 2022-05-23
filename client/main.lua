@@ -152,7 +152,6 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
 				{label = _Locale('yes'), value = 'yes'}
 		}}, function(data2, menu2)
 			if data2.current.value == 'yes' then
-                --[[
                 local generatedPlate = GeneratePlate()
                 Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(success)
                     if success then
@@ -173,7 +172,7 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
                         Notification('error', _Locale('not_enough_money'), {shop_name = shopName})
                     end
                 end, vehicleData.model, generatedPlate)
-                ]]
+                
 			else
 				menu2.close()
 			end
