@@ -41,7 +41,7 @@ do
                                 isTextUIShown = true
                             end
                             if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
-                                OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition)
+                                OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition, v.DeliveryPosition)
                             end
                         else                        
                             if isTextUIShown then
@@ -56,7 +56,7 @@ do
     end
 end
 
-function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition)
+function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition)
     Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
 		vehicles = result.vehicles
         categories = result.categories
@@ -72,8 +72,6 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
 	local firstVehicleData = nil
     local isFirstvehicleDataSet = false
 
-    
-
     for t = 1, #categoriesToShow, 1 do
         for i = 1, #categories, 1 do
             if categoriesToShow[t] == categories[i].name then
@@ -83,8 +81,6 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
         end  
     end
     
-    
-
     for i = 1, #vehicles, 1 do
 		if IsModelInCdimage(GetHashKey(vehicles[i].model)) then
             if vehiclesByCategory[vehicles[i].category] then
@@ -152,26 +148,25 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
 				{label = _Locale('yes'), value = 'yes'}
 		}}, function(data2, menu2)
 			if data2.current.value == 'yes' then
-                local generatedPlate = GeneratePlate()
-                Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(success)
-                    if success then
+                Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(result)
+                    if result.success == true then
                         isInShopMenu = false
                         menu2.close()
                         menu.close()
                         DeleteDisplayVehicle()
                         
-                        Core.Game.SpawnVehicle(vehicleData.model, Config.Zones.ShopOutside.Pos, Config.Zones.ShopOutside.Heading, function(vehicle)
+                        Core.Game.SpawnVehicle(vehicleData.model, vec(deliveryPosition.x, deliveryPosition.y, deliveryPosition.z), deliveryPosition.h, function(vehicle)
                             TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-                            SetVehicleNumberPlateText(vehicle, generatedPlate)
+                            SetVehicleNumberPlateText(vehicle, result.plate)
                             FreezeEntityPosition(playerPed, false)
                             SetEntityVisible(playerPed, true)
                         end)
 
-                        Notification('success', _Locale('purchase_successful', vehicleData.name, generatedPlate), {shop_name = shopName})
+                        Notification('success', _Locale('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
                     else
                         Notification('error', _Locale('not_enough_money'), {shop_name = shopName})
                     end
-                end, vehicleData.model, generatedPlate)
+                end, vehicleData.model)
                 
 			else
 				menu2.close()

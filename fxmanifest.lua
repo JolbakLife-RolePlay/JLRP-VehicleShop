@@ -1,5 +1,5 @@
 fx_version 'cerulean'
-
+use_fxv2_oal 'yes'
 game 'gta5'
 lua54 'yes'
 
@@ -32,4 +32,8 @@ client_scripts {
 dependencies {
 	'oxmysql',
 	'JLRP-Framework',
+}
+
+provides {
+	'esx_vehicleshop'
 }
