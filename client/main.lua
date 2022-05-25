@@ -79,9 +79,9 @@ do
         if v.Blip and v.Blip == true then
             local blip = AddBlipForCoord(marker)
 
-            SetBlipSprite (blip, v.BlipType or 326)
+            SetBlipSprite(blip, v.BlipType or 326)
             SetBlipDisplay(blip, 2)
-            SetBlipScale  (blip, v.BlipSize and (v.BlipSize + 0.0) or 1.0)
+            SetBlipScale(blip, v.BlipSize and (v.BlipSize + 0.0) or 1.0)
             SetBlipAsShortRange(blip, true)
 
             BeginTextCommandSetBlipName('STRING')
@@ -95,26 +95,36 @@ do
             debugPoly = false
         })
         
-        local acceptedTypes
+        local acceptedTypes = ''
 
         if v.Type then
             if type(v.Type) == 'string' then
                 local _temp = v.Type
                 v.Type = {}
                 v.Type[1] = _temp
+                acceptedTypes = v.Type[1]
             elseif type(v.Type) == 'table' then
                 for t = 1, #v.Type, 1 do
+                    acceptedTypes = acceptedTypes..v.Type[t]..', '
                     if v.Type[t] == 'all' then
                         table.wipe(v.Type)
                         v.Type = {}
                         v.Type[1] = 'all'
+                        acceptedTypes = v.Type[1]
                         break
                     end
+                end
+
+                local length = string.len(acceptedTypes)
+                local _temp = string.sub(acceptedTypes, length-1, length)
+                if _temp == ', ' then
+                    acceptedTypes = string.sub(acceptedTypes, 1, length - 2)
                 end
             end
         else
             v.Type = {}
             v.Type[1] = 'all'
+            acceptedTypes = v.Type[1]
         end
 
         zone:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside)

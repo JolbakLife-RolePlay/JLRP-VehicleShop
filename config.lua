@@ -33,9 +33,9 @@ Config.Zones = {
             ShopName = 'Original Motor Shop',
             MarkerPosition = {x = -43.4, y = -1104.8, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
-            MarkerRGB = {r = 255, g = 255, b = 255},
+            MarkerRGB = {r = 0, g = 255, b = 255},
             MarkerDrawDistance = 20.0,
-            MarkerType = 36,
+            MarkerType = 37,
             Blip = true,
             BlipType = 226,
             BlipColour = 0,
@@ -47,7 +47,7 @@ Config.Zones = {
 
     SellZones = {
         {
-            Type = {'sports', 'super'},
+            Type = {'sports', 'all'},
             MarkerPosition = {x = -36.29, y = -1088.59, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
