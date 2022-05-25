@@ -142,7 +142,7 @@ do
                                 isTextUIShown = true
                             end
                             if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
-                                OpenSellMenu()
+                                OpenSellMenu(v.Type, acceptedTypes)
                             end
                         else                        
                             if isTextUIShown then
@@ -347,7 +347,8 @@ function DeleteDisplayVehicle()
     end
 end
 
-function OpenSellMenu()
+function OpenSellMenu(categoriesToSell, acceptedCategories)
+    local callback = 'waiting'
     isInShopMenu = true
     StartShopRestriction()
 	Core.UI.Menu.CloseAll()
@@ -358,9 +359,24 @@ function OpenSellMenu()
 
     FreezeEntityPosition(vehicle, true)
 
-    Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclePrice', function(price)
-        if price then
-            price = price / 100 * Config.ResellPercentage
+    Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclePriceAndType', function(result)
+        if result then
+            if categoriesToSell[1] ~= 'all' then
+                local shouldContinue = false
+                for t = 1, #categoriesToSell, 1 do
+                    if categoriesToSell[t] == result.category then
+                        shouldContinue = true
+                        break
+                    end
+                end
+                if not shouldContinue then 
+                    Notification('info', _Locale('cannot_sell_here', acceptedCategories))
+                    FreezeEntityPosition(vehicle, false)
+                    isInShopMenu = false
+                    return
+                end
+            end
+            local price = result.price / 100 * Config.ResellPercentage
             Core.UI.Menu.Open('default', RESOURCENAME, 'vehicle_shop_sell', {
                 title    = _Locale('sell_vehicle', Core.Math.GroupDigits(price)),
                 align    = Config.MenuAlignment,

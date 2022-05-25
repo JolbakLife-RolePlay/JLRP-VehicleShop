@@ -13,4 +13,5 @@ Locales['en'] = {
     ['sell_vehicle'] = 'Do you want to sell the vehicle for $%s ?',
     ['not_yours'] = 'This vehicle does not belong to you!',
     ['vehicle_sold_for'] = 'The vehicle has been sold for $%s',
+    ['cannot_sell_here'] = 'You cannot sell your vehicle in here! (accepted types of vehicle: %s)',
 }

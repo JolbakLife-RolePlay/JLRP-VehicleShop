@@ -49,7 +49,7 @@ Config.Zones = {
 
     SellZones = {
         {
-            Type = {'sports', 'all'},
+            Type = {'sports', 'super'},
             MarkerPosition = {x = -36.29, y = -1088.59, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},

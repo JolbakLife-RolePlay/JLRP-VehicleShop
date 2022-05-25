@@ -26,6 +26,10 @@ Core.RegisterServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', functio
     cb({vehicles = vehicles, categories = categories})
 end)
 
+Core.RegisterServerCallback('JLRP-VehicleShop:getVehicleCategory', function(source, cb)
+    cb({category = vehicles})
+end)
+
 function getVehicleFromModel(model)
 	for i = 1, #vehicles do
 		local vehicle = vehicles[i]
@@ -56,10 +60,9 @@ Core.RegisterServerCallback('JLRP-VehicleShop:buyVehicle', function(source, cb, 
 	end
 end)
 
-Core.RegisterServerCallback('JLRP-VehicleShop:getVehiclePrice', function(source, cb, model)
+Core.RegisterServerCallback('JLRP-VehicleShop:getVehiclePriceAndType', function(source, cb, model)
     local vehicle = getVehicleFromModel(model)
-	local modelPrice = vehicle.price
-	cb(modelPrice)
+	cb({price = vehicle.price, category = vehicle.category})
 end)
 
 Core.RegisterServerCallback('JLRP-VehicleShop:sellVehicle', function(source, cb, model, plate)
