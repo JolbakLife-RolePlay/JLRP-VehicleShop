@@ -53,6 +53,9 @@ do
                     while points[zone].isInZone do
                         Wait(0)        
                         DrawMarker(v.MarkerType or 36, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x or 1.5, v.MarkerSize.y or 1.5, v.MarkerSize.z or 1.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        if v.EnableSecondaryMarker and v.EnableSecondaryMarker == true then
+                            DrawMarker(1, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x + 1.0, v.MarkerSize.y + 1.0, 0.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        end
                         if #(PolyZone.getPlayerPosition() - points[zone].point) <= 1.5 and IsPedOnFoot(PlayerPedId()) then
                             if not isTextUIShown then
                                 TextUI('show', 'open_shop', {shop_name = v.ShopName})
@@ -135,7 +138,9 @@ do
                     while points[zone].isInZone do
                         Wait(0)        
                         DrawMarker(v.MarkerType or 36, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x or 1.5, v.MarkerSize.y or 1.5, v.MarkerSize.z or 1.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
-                        DrawMarker(1, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x + 1.0, v.MarkerSize.y + 1.0, 0.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        if v.EnableSecondaryMarker and v.EnableSecondaryMarker == true then
+                            DrawMarker(1, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x + 1.0, v.MarkerSize.y + 1.0, 0.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        end
                         if #(PolyZone.getPlayerPosition() - points[zone].point) <= 1.5 and not IsPedOnFoot(PlayerPedId()) then
                             if not isTextUIShown then
                                 TextUI('show', 'open_sell', {shop_name = _Locale('sell_blip'), accepted_types = acceptedTypes})
