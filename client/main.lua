@@ -3,7 +3,7 @@ local RESOURCENAME = GetCurrentResourceName()
 local isInShopMenu = false
 do
     while Core == nil do Wait(100) end
-    for k, v in pairs(Config.Zones.ShopEntering) do
+    for k, v in pairs(Config.Zones.Shops) do
 
         local marker = vec(v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z)
         if v.Blip and v.Blip == true then
@@ -19,13 +19,31 @@ do
             EndTextCommandSetBlipName(blip)
         end
 
-        
-
         local zone = CircleZone:Create(marker, v.MarkerDrawDistance and (v.MarkerDrawDistance + 0.0) or 20.0, {
-            name = RESOURCENAME..":CircleZone:"..k,
+            name = RESOURCENAME..":ShopsCircleZone:"..k,
             useZ = true,
             debugPoly = false
         })
+        
+        if v.Type then
+            if type(v.Type) == 'string' then
+                local _temp = v.Type
+                v.Type = {}
+                v.Type[1] = _temp
+            elseif type(v.Type) == 'table' then
+                for t = 1, #v.Type, 1 do
+                    if v.Type[t] == 'all' then
+                        table.wipe(v.Type)
+                        v.Type = {}
+                        v.Type[1] = 'all'
+                        break
+                    end
+                end
+            end
+        else
+            v.Type = {}
+            v.Type[1] = 'all'
+        end
 
         zone:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside)
             points[zone] = {point = zone:getCenter(), zone = zone, isInZone = isPointInside}
@@ -35,13 +53,86 @@ do
                     while points[zone].isInZone do
                         Wait(0)        
                         DrawMarker(v.MarkerType or 36, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x or 1.5, v.MarkerSize.y or 1.5, v.MarkerSize.z or 1.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
-                        if #(PolyZone.getPlayerPosition() - points[zone].point) <= 1.0 then
+                        if #(PolyZone.getPlayerPosition() - points[zone].point) <= 1.5 and IsPedOnFoot(PlayerPedId()) then
                             if not isTextUIShown then
                                 TextUI('show', 'open_shop', {shop_name = v.ShopName})
                                 isTextUIShown = true
                             end
                             if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
                                 OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition, v.DeliveryPosition)
+                            end
+                        else                        
+                            if isTextUIShown then
+                                TextUI('hide')
+                                isTextUIShown = false
+                            end
+                        end
+                    end
+                end)
+            end
+        end, 2000)
+    end
+
+    for k, v in pairs(Config.Zones.SellZones) do
+
+        local marker = vec(v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z)
+        if v.Blip and v.Blip == true then
+            local blip = AddBlipForCoord(marker)
+
+            SetBlipSprite (blip, v.BlipType or 326)
+            SetBlipDisplay(blip, 2)
+            SetBlipScale  (blip, v.BlipSize and (v.BlipSize + 0.0) or 1.0)
+            SetBlipAsShortRange(blip, true)
+
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentSubstringPlayerName(_Locale('sell_blip'))
+            EndTextCommandSetBlipName(blip)
+        end   
+
+        local zone = CircleZone:Create(marker, v.MarkerDrawDistance and (v.MarkerDrawDistance + 0.0) or 20.0, {
+            name = RESOURCENAME..":SellZonesCircleZone:"..k,
+            useZ = true,
+            debugPoly = false
+        })
+        
+        local acceptedTypes
+
+        if v.Type then
+            if type(v.Type) == 'string' then
+                local _temp = v.Type
+                v.Type = {}
+                v.Type[1] = _temp
+            elseif type(v.Type) == 'table' then
+                for t = 1, #v.Type, 1 do
+                    if v.Type[t] == 'all' then
+                        table.wipe(v.Type)
+                        v.Type = {}
+                        v.Type[1] = 'all'
+                        break
+                    end
+                end
+            end
+        else
+            v.Type = {}
+            v.Type[1] = 'all'
+        end
+
+        zone:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside)
+            points[zone] = {point = zone:getCenter(), zone = zone, isInZone = isPointInside}
+            if isPointInside then
+                CreateThread(function()
+                    local isTextUIShown = false
+                    while points[zone].isInZone do
+                        Wait(0)        
+                        DrawMarker(v.MarkerType or 36, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x or 1.5, v.MarkerSize.y or 1.5, v.MarkerSize.z or 1.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        DrawMarker(1, v.MarkerPosition.x, v.MarkerPosition.y, v.MarkerPosition.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.MarkerSize.x + 1.0, v.MarkerSize.y + 1.0, 0.5, v.MarkerRGB.r or 255, v.MarkerRGB.g or 255, v.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                        if #(PolyZone.getPlayerPosition() - points[zone].point) <= 1.5 and not IsPedOnFoot(PlayerPedId()) then
+                            if not isTextUIShown then
+                                TextUI('show', 'open_sell', {shop_name = _Locale('sell_blip'), accepted_types = acceptedTypes})
+                                isTextUIShown = true
+                            end
+                            if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
+                                --OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition, v.DeliveryPosition)
                             end
                         else                        
                             if isTextUIShown then
@@ -72,13 +163,19 @@ function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition
 	local firstVehicleData = nil
     local isFirstvehicleDataSet = false
 
-    for t = 1, #categoriesToShow, 1 do
+    if categoriesToShow[1] == 'all' then
         for i = 1, #categories, 1 do
-            if categoriesToShow[t] == categories[i].name then
-                vehiclesByCategory[categories[i].name] = {}
-                break
-            end
+            vehiclesByCategory[categories[i].name] = {}
         end  
+    else
+        for t = 1, #categoriesToShow, 1 do
+            for i = 1, #categories, 1 do
+                if categoriesToShow[t] == categories[i].name then
+                    vehiclesByCategory[categories[i].name] = {}
+                    break
+                end
+            end  
+        end
     end
     
     for i = 1, #vehicles, 1 do
