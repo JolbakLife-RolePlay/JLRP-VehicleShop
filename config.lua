@@ -11,6 +11,8 @@ Config.PlateLetters  = 4
 Config.PlateNumbers  = 4
 Config.PlateUseSpace = false
 
+Config.ResellPercentage = 50
+
 Config.Zones = {
     Shops = {
         {

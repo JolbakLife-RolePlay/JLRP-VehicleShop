@@ -29,7 +29,7 @@ end)
 function getVehicleFromModel(model)
 	for i = 1, #vehicles do
 		local vehicle = vehicles[i]
-		if vehicle.model == model then
+		if vehicle.model == model or GetHashKey(vehicle.model) == model then
 			return vehicle
 		end
 	end
@@ -56,3 +56,29 @@ Core.RegisterServerCallback('JLRP-VehicleShop:buyVehicle', function(source, cb, 
 	end
 end)
 
+Core.RegisterServerCallback('JLRP-VehicleShop:getVehiclePrice', function(source, cb, model)
+    local vehicle = getVehicleFromModel(model)
+	local modelPrice = vehicle.price
+	cb(modelPrice)
+end)
+
+Core.RegisterServerCallback('JLRP-VehicleShop:sellVehicle', function(source, cb, model, plate)
+	local xPlayer = Core.GetPlayerFromId(source)
+    local vehicle = getVehicleFromModel(model)
+	local modelPrice = vehicle.price
+	local callback = false
+
+	local response = SelectVehicleFromDatabase(xPlayer, model, plate)
+	if response then
+		response = RemoveOwnedVehicle(plate)
+		if response then
+			xPlayer.addMoney(Core.Math.Round(modelPrice / 100 * Config.ResellPercentage))
+			callback = true
+		else
+			callback = false
+		end
+	else
+		callback = false
+	end
+	cb(callback)
+end)

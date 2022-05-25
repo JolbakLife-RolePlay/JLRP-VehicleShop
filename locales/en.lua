@@ -10,4 +10,7 @@ Locales['en'] = {
 	['sell_blip'] = 'Sell Your Vehicle',
 	['sell_zone'] = '[E] - Sell Your Vehicle (accepted types of vehicle: %s)',
     ['all_vehicles'] = ' all types of vehicle',
+    ['sell_vehicle'] = 'Do you want to sell the vehicle for $%s ?',
+    ['not_yours'] = 'This vehicle does not belong to you!',
+    ['vehicle_sold_for'] = 'The vehicle has been sold for $%s',
 }

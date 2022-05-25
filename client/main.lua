@@ -59,7 +59,7 @@ do
                                 isTextUIShown = true
                             end
                             if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
-                                OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition, v.DeliveryPosition)
+                                OpenShopMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition, v.DeliveryPosition)
                             end
                         else                        
                             if isTextUIShown then
@@ -142,7 +142,7 @@ do
                                 isTextUIShown = true
                             end
                             if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
-                                --OpenMenu(v.Type, v.InsideShopPosition, v.ShopName, v.MarkerPosition, v.DeliveryPosition)
+                                OpenSellMenu()
                             end
                         else                        
                             if isTextUIShown then
@@ -157,7 +157,7 @@ do
     end
 end
 
-function OpenMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition)
+function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition)
     Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
 		vehicles = result.vehicles
         categories = result.categories
@@ -324,7 +324,6 @@ function StartShopRestriction()
 end
 
 function WaitForVehicleToLoad(model)
-	--local modelHash = GetHashKey(model)
     RequestModel(model)
 	if not HasModelLoaded(model) then
         DisableKeymanager(true)
@@ -346,4 +345,51 @@ function DeleteDisplayVehicle()
     if DoesEntityExist(vehicle) then
         Core.Game.DeleteVehicle(vehicle)
     end
+end
+
+function OpenSellMenu()
+    isInShopMenu = true
+    StartShopRestriction()
+	Core.UI.Menu.CloseAll()
+
+    local playerPed = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(playerPed, false)
+    local plate = Core.Math.Trim(GetVehicleNumberPlateText(vehicle))
+
+    FreezeEntityPosition(vehicle, true)
+
+    Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclePrice', function(price)
+        if price then
+            price = price / 100 * Config.ResellPercentage
+            Core.UI.Menu.Open('default', RESOURCENAME, 'vehicle_shop_sell', {
+                title    = _Locale('sell_vehicle', Core.Math.GroupDigits(price)),
+                align    = Config.MenuAlignment,
+                elements = {
+                    {label = _Locale('no'),  value = 'no'},
+                    {label = _Locale('yes'), value = 'yes'}
+                }
+            }, function(data, menu)
+                if data.current.value == 'yes' then
+                    Core.TriggerServerCallback('JLRP-VehicleShop:sellVehicle', function(result)
+						if result then
+							Core.Game.DeleteVehicle(vehicle)
+                            Notification('success', _Locale('vehicle_sold_for', Core.Math.GroupDigits(price)))
+                            isInShopMenu = false
+                            menu.close()
+						else
+                            Notification('error', _Locale('not_yours'))
+						end
+					end, GetEntityModel(vehicle), plate)
+                else
+                    FreezeEntityPosition(vehicle, false)
+                    isInShopMenu = false
+                    menu.close()
+                end
+            end, function(data, menu)
+                FreezeEntityPosition(vehicle, false)
+                isInShopMenu = false
+                menu.close()
+            end)
+        end
+    end, GetEntityModel(vehicle))
 end

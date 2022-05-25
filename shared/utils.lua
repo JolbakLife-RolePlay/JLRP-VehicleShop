@@ -51,7 +51,7 @@ if not IsDuplicityVersion() then -- Only register the body of if in client
             Core.ShowNotification(message, type, 3000)
         elseif Config.Notification == 'ox_lib' then
             lib.notify({
-                title = extra.shop_name,
+                title = extra.shop_name or '',
                 description = message,
                 position = 'left-center',
                 style = {
@@ -101,6 +101,52 @@ else -- Only register the body of else in server
             })
             if id then response = true end
         end
+        return response
+    end
+
+    function SelectVehicleFromDatabase(xPlayer, model, plate)
+        local response = false
+
+        if FRAMEWORKNAME == 'JLRP-Framework' then
+            local result = MySQL.single.await('SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?', {xPlayer.citizenid, plate})
+            if result then -- does the owner match?
+                local vehicle = json.decode(result.vehicle)
+                if GetHashKey(vehicle.model) == model then
+                    if vehicle.plate == plate then
+                        response = true
+                    else
+                        print(('[JLRP-VehicleShop] [^3WARNING^7] %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.citizenid))
+                        response = false
+                    end
+                else
+                    print(('[JLRP-VehicleShop] [^3WARNING^7] %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.citizenid))
+                    response = false
+                end
+            end
+        elseif FRAMEWORKNAME == 'es_extended' then
+            local result = MySQL.single.await('SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?', {xPlayer.identifier, plate})
+            if result then -- does the owner match?
+                local vehicle = json.decode(result.vehicle)
+                if GetHashKey(vehicle.model) == model then
+                    if vehicle.plate == plate then
+                        response = true
+                    else
+                        print(('[JLRP-VehicleShop] [^3WARNING^7] %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
+                        response = false
+                    end
+                else
+                    print(('[JLRP-VehicleShop] [^3WARNING^7] %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.identifier))
+                    response = false
+                end
+            end
+        end
+        return response
+    end
+
+    function RemoveOwnedVehicle(plate)
+        local response = false
+        local result = MySQL.update.await('DELETE FROM owned_vehicles WHERE plate = ?', {plate})
+        if result then response = true end
         return response
     end
 
