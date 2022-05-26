@@ -13,7 +13,8 @@ version '0.0'
 shared_scripts {
 	'@JLRP-Framework/shared/locale.lua',
 	'@ox_lib/init.lua',
-	'shared/utils.lua',
+	'shared/utils1.lua',
+	'shared/utils2.lua',
 	'locales/*.lua',
 	'config.lua'
 }

@@ -1,7 +1,7 @@
 local vehicles, categories = {}, {}
-local RESOURCENAME = GetCurrentResourceName()
 AddEventHandler('onResourceStart', function(resourceName)
     if resourceName == RESOURCENAME then
+		while RESOURCENAME ~= 'JLRP-VehicleShop' do print('['..RESOURCENAME..'] [^3ERROR^7] Change the resource name to \'JLRP-VehicleShop\'; otherwise it won\'t start!') Wait(5000) end
         checkNumberOfPlateCharacters()
         getVehiclesAndCategories()
 	end

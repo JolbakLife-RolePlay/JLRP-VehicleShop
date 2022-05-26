@@ -1,8 +1,8 @@
 local points, vehicles, categories = {}, {}, {}
-local RESOURCENAME = GetCurrentResourceName()
 local isInShopMenu, isThreadActive, isInAnyZone = false, false, false
 
 do
+    while RESOURCENAME ~= 'JLRP-VehicleShop' do print('Change the resource name to \'JLRP-VehicleShop\'; Otherwise it won\'t start!') Wait(5000) end
     while Core == nil do Wait(100) end
     for k, v in pairs(Config.Zones.Shops) do
 
@@ -394,7 +394,7 @@ end
 function RunThread()
     if not isThreadActive then
         isThreadActive = true
-        CreateThread(function()
+        Citizen.CreateThreadNow(function()
             local isTextUIShown, textUIIsBeingShownInK = false
             local PlayerPed
             local PlayerCoords
@@ -419,7 +419,7 @@ function RunThread()
                                 isTextUIShown = true
                                 textUIIsBeingShownInK = k
                             end
-                            if IsControlJustReleased(0, 38) and Core.GetPlayerData().dead == false then
+                            if IsControlJustReleased(0, 38) and Core.PlayerData.dead == false then
                                 if v.type == 'shop' then
                                     OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition)
                                 elseif v.type == 'sell' then
@@ -430,6 +430,7 @@ function RunThread()
                             if isTextUIShown and textUIIsBeingShownInK and textUIIsBeingShownInK == k then
                                 TextUI('hide')
                                 isTextUIShown = false
+                                textUIIsBeingShownInK = nil
                             end
                         end
                     end
