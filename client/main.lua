@@ -71,7 +71,7 @@ do
             SetBlipAsShortRange(blip, true)
 
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(_Locale('sell_blip'))
+            AddTextComponentSubstringPlayerName(_U('sell_blip'))
             EndTextCommandSetBlipName(blip)
         end
         
@@ -188,7 +188,7 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
                     isFirstvehicleDataSet = true
                 end
 
-                table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _Locale('money_currency', Core.Math.GroupDigits(vehicle.price))))
+                table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _U('money_currency', Core.Math.GroupDigits(vehicle.price))))
             end
 
             table.sort(options)
@@ -218,11 +218,11 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 		local vehicleData = vehiclesByCategory[data.current.name][data.current.value + 1]
 
 		Core.UI.Menu.Open('default', RESOURCENAME, 'shop_confirm', {
-			title = _Locale('buy_vehicle_shop', vehicleData.name, Core.Math.GroupDigits(vehicleData.price)),
+			title = _U('buy_vehicle_shop', vehicleData.name, Core.Math.GroupDigits(vehicleData.price)),
 			align = Config.MenuAlignment,
 			elements = {
-				{label = _Locale('no'),  value = 'no'},
-				{label = _Locale('yes'), value = 'yes'}
+				{label = _U('no'),  value = 'no'},
+				{label = _U('yes'), value = 'yes'}
 		}}, function(data2, menu2)
 			if data2.current.value == 'yes' then
                 Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(result)
@@ -239,9 +239,9 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
                             SetEntityVisible(playerPed, true)
                         end)
 
-                        Notification('success', _Locale('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
+                        Notification('success', _U('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
                     else
-                        Notification('error', _Locale('not_enough_money'), {shop_name = shopName})
+                        Notification('error', _U('not_enough_money'), {shop_name = shopName})
                     end
                 end, vehicleData.model)
                 
@@ -298,7 +298,7 @@ function WaitForVehicleToLoad(model)
 	if not HasModelLoaded(model) then
         DisableKeymanager(true)
 		BeginTextCommandBusyspinnerOn('STRING')
-		AddTextComponentSubstringPlayerName(_Locale('awaiting_model'))
+		AddTextComponentSubstringPlayerName(_U('awaiting_model'))
 		EndTextCommandBusyspinnerOn(4)
 
 		while not HasModelLoaded(model) do
@@ -340,7 +340,7 @@ function OpenSellMenu(categoriesToSell, acceptedCategories)
                     end
                 end
                 if not shouldContinue then 
-                    Notification('info', _Locale('cannot_sell_here', acceptedCategories))
+                    Notification('info', _U('cannot_sell_here', acceptedCategories))
                     FreezeEntityPosition(vehicle, false)
                     isInShopMenu = false
                     return
@@ -348,22 +348,22 @@ function OpenSellMenu(categoriesToSell, acceptedCategories)
             end
             local price = result.price / 100 * Config.ResellPercentage
             Core.UI.Menu.Open('default', RESOURCENAME, 'vehicle_shop_sell', {
-                title    = _Locale('sell_vehicle', Core.Math.GroupDigits(price)),
+                title    = _U('sell_vehicle', Core.Math.GroupDigits(price)),
                 align    = Config.MenuAlignment,
                 elements = {
-                    {label = _Locale('no'),  value = 'no'},
-                    {label = _Locale('yes'), value = 'yes'}
+                    {label = _U('no'),  value = 'no'},
+                    {label = _U('yes'), value = 'yes'}
                 }
             }, function(data, menu)
                 if data.current.value == 'yes' then
                     Core.TriggerServerCallback('JLRP-VehicleShop:sellVehicle', function(result)
 						if result then
 							Core.Game.DeleteVehicle(vehicle)
-                            Notification('success', _Locale('vehicle_sold_for', Core.Math.GroupDigits(price)))
+                            Notification('success', _U('vehicle_sold_for', Core.Math.GroupDigits(price)))
                             isInShopMenu = false
                             menu.close()
 						else
-                            Notification('error', _Locale('not_yours'))
+                            Notification('error', _U('not_yours'))
 						end
 					end, GetEntityModel(vehicle), plate)
                 else
@@ -414,7 +414,7 @@ function RunThread()
                                 if v.type == 'shop' then
                                     TextUI('show', 'open_shop', {shop_name = v.zone.ShopName})
                                 elseif v.type == 'sell' then
-                                    TextUI('show', 'open_sell', {shop_name = _Locale('sell_blip'), accepted_types = v.accepted_types})
+                                    TextUI('show', 'open_sell', {shop_name = _U('sell_blip'), accepted_types = v.accepted_types})
                                 end
                                 isTextUIShown = true
                                 textUIIsBeingShownInK = k

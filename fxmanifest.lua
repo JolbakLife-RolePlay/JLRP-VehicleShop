@@ -38,3 +38,9 @@ dependencies {
 provides {
 	'esx_vehicleshop'
 }
+
+escrow_ignore {
+	'config.lua',
+	'shared/utils2.lua',
+	'locales/*.lua'
+}

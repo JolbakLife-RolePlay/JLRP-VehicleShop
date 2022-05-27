@@ -16,10 +16,10 @@ if not IsDuplicityVersion() then -- Only register the body of if in client
         if type == 'show' then
             local message = '[E]'
             if reason == 'open_shop' then
-                message = _Locale('open_shop', extra.shop_name)
+                message = _U('open_shop', extra.shop_name)
             elseif reason == 'open_sell' then
-                if extra.accepted_types == 'all' then extra.accepted_types = _Locale('all_vehicles') end
-                message = _Locale('sell_zone', extra.accepted_types)
+                if extra.accepted_types == 'all' then extra.accepted_types = _U('all_vehicles') end
+                message = _U('sell_zone', extra.accepted_types)
             end
             if Config.TextUI == 'jlrp' or Config.TextUI == 'esx' then
                 Core.TextUI(message, type)
