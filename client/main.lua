@@ -1,5 +1,5 @@
 local points, vehicles, categories = {}, {}, {}
-local isInShopMenu, isThreadActive, isInAnyZone, isShopRestrictionThreadActive = false, false, false, false
+local isInShopMenu, isThreadActive, isInAnyZone, isShopRestrictionThreadActive, isTestDriving = false, false, false, false, false
 
 do
     while RESOURCENAME ~= 'JLRP-VehicleShop' do print('Change the resource name to \'JLRP-VehicleShop\'; Otherwise it won\'t start!') Wait(5000) end
@@ -127,7 +127,7 @@ do
     end
 end
 
-function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition)
+function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition, testDrive)
     Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
 		vehicles = result.vehicles
         categories = result.categories
@@ -206,9 +206,22 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
     
     local playerPed = PlayerPedId()
 
-	FreezeEntityPosition(playerPed, true)
-	SetEntityVisible(playerPed, false)
+	SetPlayerVisible(false)
 	SetEntityCoords(playerPed, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z))
+
+    local confirmElements
+    if testDrive.Enable and testDrive.Enable == true then
+        confirmElements = {
+            {label = _U('test_drive', testDrive.Time), value = 'test'},
+            {label = _U('no'),  value = 'no'},
+            {label = _U('yes'), value = 'yes'}
+        }
+    else
+        confirmElements = {
+            {label = _U('no'),  value = 'no'},
+            {label = _U('yes'), value = 'yes'}
+        }
+    end
 
     Core.UI.Menu.Open('default', RESOURCENAME, 'vehicle_shop', {
 		title    = shopName,
@@ -220,10 +233,8 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 		Core.UI.Menu.Open('default', RESOURCENAME, 'shop_confirm', {
 			title = _U('buy_vehicle_shop', vehicleData.name, Core.Math.GroupDigits(vehicleData.price)),
 			align = Config.MenuAlignment,
-			elements = {
-				{label = _U('no'),  value = 'no'},
-				{label = _U('yes'), value = 'yes'}
-		}}, function(data2, menu2)
+			elements = confirmElements
+        }, function(data2, menu2)
 			if data2.current.value == 'yes' then
                 Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(result)
                     if result.success == true then
@@ -235,8 +246,7 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
                         Core.Game.SpawnVehicle(vehicleData.model, vec(deliveryPosition.x, deliveryPosition.y, deliveryPosition.z), deliveryPosition.h, function(vehicle)
                             TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
                             SetVehicleNumberPlateText(vehicle, result.plate)
-                            FreezeEntityPosition(playerPed, false)
-                            SetEntityVisible(playerPed, true)
+                            SetPlayerVisible(true)
                         end)
 
                         Notification('success', _U('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
@@ -244,8 +254,26 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
                         Notification('error', _U('not_enough_money'), {shop_name = shopName})
                     end
                 end, vehicleData.model)
-                
-			else
+			elseif data2.current.value == 'test' then
+                local playerPed = PlayerPedId()
+                isInShopMenu = false
+                isTestDriving = true
+				menu2.close()
+				menu.close()
+				DeleteDisplayVehicle()
+                SetPlayerVisible(true)
+                SetEntityCoords(playerPed, vec(testDrive.Position.x, testDrive.Position.y, testDrive.Position.z))		
+				Core.Game.SpawnVehicle(vehicleData.model, vec(testDrive.Position.x, testDrive.Position.y, testDrive.Position.z), testDrive.Position.h, function(vehicle)			
+					SetVehicleNumberPlateText(vehicle, 'TEST')
+                    TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+                    Notification('info', _U('test_drive_began', testDrive.Time), {timeout = 5000})
+                    ProgressBar(_U('test_drive_progress'), testDrive.Time)
+                    Notification('info', _U('test_drive_finished', testDrive.Time), {timeout = 5000})
+                    isTestDriving = false
+					Core.Game.DeleteVehicle(vehicle)
+					Core.Game.Teleport(playerPed, vec(markerPosition.x, markerPosition.y, markerPosition.z))
+				end)
+            else
 				menu2.close()
 			end
 		end, function(data2, menu2)
@@ -256,8 +284,7 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 		DeleteDisplayVehicle()
 		local playerPed = PlayerPedId()
 
-		FreezeEntityPosition(playerPed, false)
-		SetEntityVisible(playerPed, true)
+		SetPlayerVisible(true)
 		SetEntityCoords(playerPed, vec(markerPosition.x, markerPosition.y, markerPosition.z))
 
 		isInShopMenu = false
@@ -408,38 +435,42 @@ function RunThread()
             while isInAnyZone do
                 PlayerPed = PlayerPedId()
                 PlayerCoords = GetEntityCoords(PlayerPed)
-                for k, v in pairs(points) do
-                    distance = #(v.point - PlayerCoords)
-                    if v.isInZone == true and (distance <= v.zone.MarkerDrawDistance) then
-                        DrawMarker(v.zone.MarkerType or 36, v.zone.MarkerPosition.x, v.zone.MarkerPosition.y, v.zone.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.zone.MarkerSize.x or 1.5, v.zone.MarkerSize.y or 1.5, v.zone.MarkerSize.z or 1.5, v.zone.MarkerRGB.r or 255, v.zone.MarkerRGB.g or 255, v.zone.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
-                        if v.zone.EnableSecondaryMarker and v.zone.EnableSecondaryMarker == true then
-                            DrawMarker(1, v.zone.MarkerPosition.x, v.zone.MarkerPosition.y, v.zone.MarkerPosition.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.zone.MarkerSize.x + 1.0, v.zone.MarkerSize.y + 1.0, 0.5, v.zone.MarkerRGB.r or 255, v.zone.MarkerRGB.g or 255, v.zone.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
-                        end
-                        if distance <= 1.5 and (v.type == 'shop' and IsPedOnFoot(PlayerPed) or v.type == 'sell' and not IsPedOnFoot(PlayerPed)) then
-                            if not isTextUIShown then
-                                if v.type == 'shop' then
-                                    TextUI('show', 'open_shop', {shop_name = v.zone.ShopName})
-                                elseif v.type == 'sell' then
-                                    TextUI('show', 'open_sell', {shop_name = _U('sell_blip'), accepted_types = v.accepted_types})
+                if not isTestDriving then
+                    for k, v in pairs(points) do
+                        distance = #(v.point - PlayerCoords)
+                        if v.isInZone == true and (distance <= v.zone.MarkerDrawDistance) then
+                            DrawMarker(v.zone.MarkerType or 36, v.zone.MarkerPosition.x, v.zone.MarkerPosition.y, v.zone.MarkerPosition.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.zone.MarkerSize.x or 1.5, v.zone.MarkerSize.y or 1.5, v.zone.MarkerSize.z or 1.5, v.zone.MarkerRGB.r or 255, v.zone.MarkerRGB.g or 255, v.zone.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                            if v.zone.EnableSecondaryMarker and v.zone.EnableSecondaryMarker == true then
+                                DrawMarker(1, v.zone.MarkerPosition.x, v.zone.MarkerPosition.y, v.zone.MarkerPosition.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.zone.MarkerSize.x + 1.0, v.zone.MarkerSize.y + 1.0, 0.5, v.zone.MarkerRGB.r or 255, v.zone.MarkerRGB.g or 255, v.zone.MarkerRGB.b or 255, 50, false, true, 2, nil, nil, false)
+                            end
+                            if distance <= 1.5 and (v.type == 'shop' and IsPedOnFoot(PlayerPed) or v.type == 'sell' and not IsPedOnFoot(PlayerPed)) then
+                                if not isTextUIShown then
+                                    if v.type == 'shop' then
+                                        TextUI('show', 'open_shop', {shop_name = v.zone.ShopName})
+                                    elseif v.type == 'sell' then
+                                        TextUI('show', 'open_sell', {shop_name = _U('sell_blip'), accepted_types = v.accepted_types})
+                                    end
+                                    isTextUIShown = true
+                                    textUIIsBeingShownInK = k
                                 end
-                                isTextUIShown = true
-                                textUIIsBeingShownInK = k
-                            end
-                            if IsControlJustReleased(0, 38) and Core.PlayerData.dead == false then
-                                if v.type == 'shop' then
-                                    OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition)
-                                elseif v.type == 'sell' then
-                                    OpenSellMenu(v.zone.Type, v.accepted_types, v.zone.ResellPercentage)
-                                end     
-                            end
-                        else
-                            if isTextUIShown and textUIIsBeingShownInK and textUIIsBeingShownInK == k then
-                                TextUI('hide')
-                                isTextUIShown = false
-                                textUIIsBeingShownInK = nil
+                                if IsControlJustReleased(0, 38) and Core.PlayerData.dead == false then
+                                    if v.type == 'shop' then
+                                        OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition, v.zone.TestDrive)
+                                    elseif v.type == 'sell' then
+                                        OpenSellMenu(v.zone.Type, v.accepted_types, v.zone.ResellPercentage)
+                                    end     
+                                end
+                            else
+                                if isTextUIShown and textUIIsBeingShownInK and textUIIsBeingShownInK == k then
+                                    TextUI('hide')
+                                    isTextUIShown = false
+                                    textUIIsBeingShownInK = nil
+                                end
                             end
                         end
                     end
+                else
+                    Wait(2000)
                 end
                 Wait(0)
             end

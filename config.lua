@@ -3,6 +3,7 @@ Config.Locale = 'en'
 
 Config.TextUI = 'ox_lib' -- valid values: 'jlrp' or 'ox_lib' or 'esx'
 Config.Notification = 'jlrp' -- valid values: 'jlrp' or 'ox_lib' or 'esx'
+Config.ProgressBar = 'ox_lib' -- valid values: 'jlrp' or 'ox_lib' or 'esx'
 Config.MenuAlignment = 'right'
 
 -- looks like this: 'LLL 111'
@@ -28,6 +29,11 @@ Config.Zones = {
             BlipSize = 1.0,
             InsideShopPosition = {x = -47.5, y = -1097.2, z = 25.4, h = -20.0},
             DeliveryPosition = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0},
+            TestDrive = {
+                Enable = true,
+                Time = 60,
+                Position = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}
+            }
         },
         {
             Type = {'motorcycles', 'bikes'},
@@ -44,6 +50,11 @@ Config.Zones = {
             BlipSize = 1.0,
             InsideShopPosition = {x = -47.5, y = -1097.2, z = 25.4, h = -20.0},
             DeliveryPosition = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0},
+            TestDrive = {
+                Enable = true,
+                Time = 60,
+                Position = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}
+            }
         },
         --[[
         {
@@ -61,6 +72,11 @@ Config.Zones = {
             BlipSize = 1.0, -- size of blip on map - only works if Blip is true
             InsideShopPosition = {x = -47.5, y = -1097.2, z = 25.4, h = -20.0}, -- position where you will preview the vehicles of current shop
             DeliveryPosition = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}, -- position that the vehicle is spawned if the purchase is successful
+            TestDrive = {
+                Enable = true, -- enables/disables the test drive functionality for current shop
+                Time = 60, -- time of the test drive is seconds - only works if Enable is true
+                Position = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}
+            }
         }
         ]]
     },

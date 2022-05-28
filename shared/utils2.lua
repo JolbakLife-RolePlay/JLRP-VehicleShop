@@ -45,7 +45,7 @@ if not IsDuplicityVersion() then -- Only register the body of if in client
     
     function Notification(type, message, extra)
         if Config.Notification == 'jlrp' or Config.Notification == 'esx' then
-            Core.ShowNotification(message, type, 3000)
+            Core.ShowNotification(message, type, extra.timeout or 3000)
         elseif Config.Notification == 'ox_lib' then
             lib.notify({
                 title = extra.shop_name or '',
@@ -62,11 +62,29 @@ if not IsDuplicityVersion() then -- Only register the body of if in client
             })
         end
     end
+
+    function ProgressBar(message, length, extra)
+        length = length * 1000
+        if Config.ProgressBar == 'jlrp' or Config.ProgressBar == 'esx' then
+            Core.Progressbar(message, length, {FreezePlayer = false})
+        elseif Config.ProgressBar == 'ox_lib' then
+            lib.progressBar({
+                duration = length,
+                label = message
+            })
+        end
+    end
     
-    function DisableKeymanager(state)
+    function DisableKeymanager(state) -- integrate your keymanager(RegisterKeyMapping manager) if you have one inside this function
         if FRAMEWORKNAME == 'JLRP-Framework' then
             FRAMEWORK:disableControl(state)
         end
+    end
+
+    function SetPlayerVisible(state, playerPed) -- integrate anticheat inside this function if needed
+        playerPed = playerPed or PlayerPedId()
+        FreezeEntityPosition(playerPed, not state)
+        SetEntityVisible(playerPed, state)
     end
 
     if FRAMEWORKNAME == 'JLRP-Framework' then

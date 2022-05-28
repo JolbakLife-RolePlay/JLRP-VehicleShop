@@ -14,4 +14,8 @@ Locales['en'] = {
     ['not_yours'] = 'This vehicle does not belong to you!',
     ['vehicle_sold_for'] = 'The vehicle has been sold for $%s',
     ['cannot_sell_here'] = 'You cannot sell your vehicle in here! (accepted types of vehicle: %s)',
+    ['test_drive'] = 'Test Drive (%s Seconds)',
+    ['test_drive_began'] = 'The test drive started for (%s seconds)',
+    ['test_drive_progress'] = 'Test Drive',
+    ['test_drive_finished'] = 'The test drive of %s seconds has finished',
 }
