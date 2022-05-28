@@ -45,7 +45,7 @@ if not IsDuplicityVersion() then -- Only register the body of if in client
     
     function Notification(type, message, extra)
         if Config.Notification == 'jlrp' or Config.Notification == 'esx' then
-            Core.ShowNotification(message, type, extra.timeout or 3000)
+            Core.ShowNotification(message, type, 5000)
         elseif Config.Notification == 'ox_lib' then
             lib.notify({
                 title = extra.shop_name or '',
