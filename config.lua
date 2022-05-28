@@ -33,7 +33,8 @@ Config.Zones = {
                 Enable = true,
                 Time = 60,
                 Position = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}
-            }
+            },
+			Buyable = true
         },
         {
             Type = {'motorcycles', 'bikes'},
@@ -54,7 +55,8 @@ Config.Zones = {
                 Enable = true,
                 Time = 60,
                 Position = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}
-            }
+            },
+			Buyable = true
         },
         --[[
         {
@@ -76,7 +78,8 @@ Config.Zones = {
                 Enable = true, -- enables/disables the test drive functionality for current shop
                 Time = 60, -- time of the test drive is seconds - only works if Enable is true
                 Position = {x = -28.6, y = -1085.6, z = 25.5, h = 330.0}
-            }
+            },
+            Buyable = true -- let the player buy vehicles from current shop or not. useful when you plan to ask for real-life money from players instead of in-game money for some vehicles
         }
         ]]
     },

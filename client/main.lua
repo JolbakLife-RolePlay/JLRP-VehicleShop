@@ -127,7 +127,7 @@ do
     end
 end
 
-function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition, testDrive)
+function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition, testDrive, isBuyable)
     Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
 		vehicles = result.vehicles
         categories = result.categories
@@ -236,24 +236,28 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 			elements = confirmElements
         }, function(data2, menu2)
 			if data2.current.value == 'yes' then
-                Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(result)
-                    if result.success == true then
-                        isInShopMenu = false
-                        menu2.close()
-                        menu.close()
-                        DeleteDisplayVehicle()
-                        
-                        Core.Game.SpawnVehicle(vehicleData.model, vec(deliveryPosition.x, deliveryPosition.y, deliveryPosition.z), deliveryPosition.h, function(vehicle)
-                            TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-                            SetVehicleNumberPlateText(vehicle, result.plate)
-                            SetPlayerVisible(true)
-                        end)
+                if isBuyable == true then
+                    Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(result)
+                        if result.success == true then
+                            isInShopMenu = false
+                            menu2.close()
+                            menu.close()
+                            DeleteDisplayVehicle()
+                            
+                            Core.Game.SpawnVehicle(vehicleData.model, vec(deliveryPosition.x, deliveryPosition.y, deliveryPosition.z), deliveryPosition.h, function(vehicle)
+                                TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+                                SetVehicleNumberPlateText(vehicle, result.plate)
+                                SetPlayerVisible(true)
+                            end)
 
-                        Notification('success', _U('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
-                    else
-                        Notification('error', _U('not_enough_money'), {shop_name = shopName})
-                    end
-                end, vehicleData.model)
+                            Notification('success', _U('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
+                        else
+                            Notification('error', _U('not_enough_money'), {shop_name = shopName})
+                        end
+                    end, vehicleData.model)
+                else
+                    Notification('info', _U('not_buyable'), {shop_name = shopName})
+                end
 			elseif data2.current.value == 'test' then
                 local playerPed = PlayerPedId()
                 isInShopMenu = false
@@ -455,7 +459,7 @@ function RunThread()
                                 end
                                 if IsControlJustReleased(0, 38) and Core.PlayerData.dead == false then
                                     if v.type == 'shop' then
-                                        OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition, v.zone.TestDrive)
+                                        OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition, v.zone.TestDrive, v.zone.Buyable)
                                     elseif v.type == 'sell' then
                                         OpenSellMenu(v.zone.Type, v.accepted_types, v.zone.ResellPercentage)
                                     end     

@@ -18,4 +18,5 @@ Locales['en'] = {
     ['test_drive_began'] = 'The test drive started for (%s seconds)',
     ['test_drive_progress'] = 'Test Drive',
     ['test_drive_finished'] = 'The test drive of %s seconds has finished',
+    ['not_buyable'] = 'You\'re not allowed to buy any vehicle from this shop! Contact the adminstrator team...',
 }
