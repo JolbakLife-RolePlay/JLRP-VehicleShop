@@ -26,10 +26,6 @@ Core.RegisterServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', functio
     cb({vehicles = vehicles, categories = categories})
 end)
 
-Core.RegisterServerCallback('JLRP-VehicleShop:getVehicleCategory', function(source, cb)
-    cb({category = vehicles})
-end)
-
 function getVehicleFromModel(model)
 	for i = 1, #vehicles do
 		local vehicle = vehicles[i]
@@ -65,7 +61,7 @@ Core.RegisterServerCallback('JLRP-VehicleShop:getVehiclePriceAndType', function(
 	cb({price = vehicle.price, category = vehicle.category})
 end)
 
-Core.RegisterServerCallback('JLRP-VehicleShop:sellVehicle', function(source, cb, model, plate)
+Core.RegisterServerCallback('JLRP-VehicleShop:sellVehicle', function(source, cb, model, plate, resellPercentage)
 	local xPlayer = Core.GetPlayerFromId(source)
     local vehicle = getVehicleFromModel(model)
 	local modelPrice = vehicle.price
@@ -75,7 +71,7 @@ Core.RegisterServerCallback('JLRP-VehicleShop:sellVehicle', function(source, cb,
 	if response then
 		response = RemoveOwnedVehicle(plate)
 		if response then
-			xPlayer.addMoney(Core.Math.Round(modelPrice / 100 * Config.ResellPercentage))
+			xPlayer.addMoney(Core.Math.Round(modelPrice / 100 * resellPercentage))
 			callback = true
 		else
 			callback = false

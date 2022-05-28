@@ -1,5 +1,5 @@
 local points, vehicles, categories = {}, {}, {}
-local isInShopMenu, isThreadActive, isInAnyZone = false, false, false
+local isInShopMenu, isThreadActive, isInAnyZone, isShopRestrictionThreadActive = false, false, false, false
 
 do
     while RESOURCENAME ~= 'JLRP-VehicleShop' do print('Change the resource name to \'JLRP-VehicleShop\'; Otherwise it won\'t start!') Wait(5000) end
@@ -284,12 +284,15 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 end
 
 function StartShopRestriction()
-	CreateThread(function()
+    if isShopRestrictionThreadActive == true then return end
+    isShopRestrictionThreadActive = true
+	Citizen.CreateThreadNow(function()
 		while isInShopMenu do
 			Wait(0)
 			DisableControlAction(0, 75,  true) -- Disable exit vehicle
 			DisableControlAction(27, 75, true) -- Disable exit vehicle
 		end
+        isShopRestrictionThreadActive = false
 	end)
 end
 
@@ -317,7 +320,7 @@ function DeleteDisplayVehicle()
     end
 end
 
-function OpenSellMenu(categoriesToSell, acceptedCategories)
+function OpenSellMenu(categoriesToSell, acceptedCategories, resellPercentage)
     local callback = 'waiting'
     isInShopMenu = true
     StartShopRestriction()
@@ -346,7 +349,7 @@ function OpenSellMenu(categoriesToSell, acceptedCategories)
                     return
                 end
             end
-            local price = result.price / 100 * Config.ResellPercentage
+            local price = result.price / 100 * resellPercentage
             Core.UI.Menu.Open('default', RESOURCENAME, 'vehicle_shop_sell', {
                 title    = _U('sell_vehicle', Core.Math.GroupDigits(price)),
                 align    = Config.MenuAlignment,
@@ -365,7 +368,7 @@ function OpenSellMenu(categoriesToSell, acceptedCategories)
 						else
                             Notification('error', _U('not_yours'))
 						end
-					end, GetEntityModel(vehicle), plate)
+					end, GetEntityModel(vehicle), plate, resellPercentage)
                 else
                     FreezeEntityPosition(vehicle, false)
                     isInShopMenu = false
@@ -376,6 +379,9 @@ function OpenSellMenu(categoriesToSell, acceptedCategories)
                 isInShopMenu = false
                 menu.close()
             end)
+        else
+            FreezeEntityPosition(vehicle, false)
+            isInShopMenu = false
         end
     end, GetEntityModel(vehicle))
 end
@@ -423,7 +429,7 @@ function RunThread()
                                 if v.type == 'shop' then
                                     OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition)
                                 elseif v.type == 'sell' then
-                                    OpenSellMenu(v.zone.Type, v.accepted_types)
+                                    OpenSellMenu(v.zone.Type, v.accepted_types, v.zone.ResellPercentage)
                                 end     
                             end
                         else

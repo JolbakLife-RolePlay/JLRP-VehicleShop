@@ -11,8 +11,6 @@ Config.PlateLetters  = 4
 Config.PlateNumbers  = 4
 Config.PlateUseSpace = false
 
-Config.ResellPercentage = 50
-
 Config.Zones = {
     Shops = {
         {
@@ -80,6 +78,7 @@ Config.Zones = {
             BlipType = 326,
             BlipColour = 0,
             BlipSize = 1.0,
+            ResellPercentage = 50
         },
         {
             Type = {'motorcycles'},
@@ -93,6 +92,7 @@ Config.Zones = {
             BlipType = 326,
             BlipColour = 0,
             BlipSize = 1.0,
+            ResellPercentage = 50
         },
         {
             Type = {'bikes'},
@@ -106,6 +106,7 @@ Config.Zones = {
             BlipType = 326,
             BlipColour = 0,
             BlipSize = 1.0,
+            ResellPercentage = 50
         },
         --[[
         {
@@ -120,6 +121,7 @@ Config.Zones = {
             BlipType = 326, -- type of blip on map - only works if Blip is true
             BlipColour = 0, -- colour of blip on map - only works if Blip is true
             BlipSize = 1.0, -- size of blip on map - only works if Blip is true
+            ResellPercentage = 50 -- the percentage of original vehicle money will be added to player after the sale is successful
         }
         ]]
     }
