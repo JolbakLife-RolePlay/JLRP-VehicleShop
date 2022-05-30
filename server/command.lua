@@ -1,6 +1,8 @@
 if Config.TransferVehicle.Enable == true then
     Core.RegisterCommand(Config.TransferVehicle.Command, 'user', function(xPlayer, args, showError)
 
+        if xPlayer.source == args.playerId.source then showError(_U('cannot_transfer_to_self')) return end
+
         local playerPed = GetPlayerPed(xPlayer.source)
         local vehicle = GetVehiclePedIsIn(playerPed, false)
         if vehicle == 0 then showError(_U('not_in_vehicle')) return end
@@ -11,11 +13,11 @@ if Config.TransferVehicle.Enable == true then
 
         local response = SelectVehicleFromDatabase(xPlayer, model, plate)
         if response then
-            if #(GetEntityCoords(playerPed) - GetEntityCoords(targetPed) <= Config.TransferVehicle.DistanceToTargetPlayer + 0.0) then
-                response = TransferOwnedVehicle(plate, args.playerId)
-                if response then
-                    xPlayer.showNotification(_U('self_transfer_successful', plate, (args.playerId.get('firstname')..' '..args.playerId.get('lastname')), args.playerId.source))
-                    args.playerId.showNotification(_U('target_transfer_successful', (xPlayer.get('firstname')..' '..xPlayer.get('lastname')), xPlayer.source, plate))
+            if #(GetEntityCoords(playerPed) - GetEntityCoords(targetPed)) <= Config.TransferVehicle.DistanceToTargetPlayer + 0.0 then
+                local result = TransferOwnedVehicle(plate, args.playerId)
+                if result then
+                    xPlayer.showNotification(_U('self_transfer_successful', plate, GetPlayerName(args.playerId.source), args.playerId.source))
+                    args.playerId.showNotification(_U('target_transfer_successful', GetPlayerName(xPlayer.source), xPlayer.source, plate))
                 else
                     showError(_U('error_in_transfer'))
                 end

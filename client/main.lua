@@ -457,7 +457,7 @@ function RunThread()
                                     isTextUIShown = true
                                     textUIIsBeingShownInK = k
                                 end
-                                if IsControlJustReleased(0, 38) and Core.PlayerData.dead == false then
+                                if IsControlJustReleased(0, 38) and not IsPedFatallyInjured(PlayerPed) then
                                     if v.type == 'shop' then
                                         OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition, v.zone.TestDrive, v.zone.Buyable)
                                     elseif v.type == 'sell' then

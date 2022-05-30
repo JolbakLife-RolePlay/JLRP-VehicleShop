@@ -26,4 +26,5 @@ Locales['en'] = {
     ['target_too_far'] = 'The target player is too far from you!',
     ['self_transfer_successful'] = 'Your vehicle with the plate of %s was transferred to %s (id: %s)',
     ['target_transfer_successful'] = '%s (id: %s) has transferred you a vehicle with the plate of %s',
+    ['cannot_transfer_to_self'] = 'You cannot transfer your own vehicle to your self!',
 }
