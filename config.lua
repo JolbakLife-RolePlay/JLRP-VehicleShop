@@ -12,6 +12,12 @@ Config.PlateLetters  = 4
 Config.PlateNumbers  = 4
 Config.PlateUseSpace = false
 
+Config.TransferVehicle = {
+    Enable = true,
+    Command = 'transfervehicle',
+    DistanceToTargetPlayer = 10.0
+}
+
 Config.Zones = {
     Shops = {
         {

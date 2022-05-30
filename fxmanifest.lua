@@ -21,7 +21,8 @@ shared_scripts {
 
 server_scripts {
 	'@oxmysql/lib/MySQL.lua',
-    'server/main.lua'
+    'server/main.lua',
+    'server/command.lua'
 }
 
 client_scripts {

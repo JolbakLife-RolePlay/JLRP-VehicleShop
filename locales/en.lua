@@ -19,4 +19,11 @@ Locales['en'] = {
     ['test_drive_progress'] = 'Test Drive',
     ['test_drive_finished'] = 'The test drive of %s seconds has finished',
     ['not_buyable'] = 'You\'re not allowed to buy any vehicle from this shop! Contact the adminstrator team...',
+    ['command_transfervehicle'] = 'Transfer your owned vehicle to another player',
+    ['command_playerid'] = 'Player\'s Server ID',
+    ['not_in_vehicle'] = 'You must be sitting in the vehicle you want to transfer...',
+    ['error_in_transfer'] = 'There was an error in transfering vehicle...',
+    ['target_too_far'] = 'The target player is too far from you!',
+    ['self_transfer_successful'] = 'Your vehicle with the plate of %s was transferred to %s (id: %s)',
+    ['target_transfer_successful'] = '%s (id: %s) has transferred you a vehicle with the plate of %s',
 }

@@ -79,6 +79,25 @@ if IsDuplicityVersion() then -- Only register the body of else in server
         return response
     end
 
+    function TransferOwnedVehicle(plate, targetPlayer)
+        local response = false
+        if FRAMEWORKNAME == 'JLRP-Framework' then
+            local id = MySQL.update.await('UPDATE owned_vehicles SET owner = ?, owner_identifier = ? WHERE plate = ?', {
+                targetPlayer.citizenid,
+                targetPlayer.identifier,
+                plate
+            })
+            if id then response = true end
+        elseif FRAMEWORKNAME == 'es_extended' then
+            local id = MySQL.update.await('UPDATE owned_vehicles SET owner = ? WHERE plate = ?', {
+                targetPlayer.identifier,
+                plate
+            })
+            if id then response = true end
+        end
+        return response
+    end
+
 end
 
 local NumberCharset = {}
