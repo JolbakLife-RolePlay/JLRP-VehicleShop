@@ -28,24 +28,24 @@ do
             debugPoly = false
         })
         
-        if v.Type then
-            if type(v.Type) == 'string' then
-                local _temp = v.Type
-                v.Type = {}
-                v.Type[1] = _temp
-            elseif type(v.Type) == 'table' then
-                for t = 1, #v.Type, 1 do
-                    if v.Type[t] == 'all' then
-                        table.wipe(v.Type)
-                        v.Type = {}
-                        v.Type[1] = 'all'
+        if v.Category then
+            if type(v.Category) == 'string' then
+                local _temp = v.Category
+                v.Category = {}
+                v.Category[1] = _temp
+            elseif type(v.Category) == 'table' then
+                for t = 1, #v.Category, 1 do
+                    if v.Category[t] == 'all' then
+                        table.wipe(v.Category)
+                        v.Category = {}
+                        v.Category[1] = 'all'
                         break
                     end
                 end
             end
         else
-            v.Type = {}
-            v.Type[1] = 'all'
+            v.Category = {}
+            v.Category[1] = 'all'
         end
 
         points[zone] = {point = zone:getCenter(), zone = v, isInZone = false, type = 'shop'}
@@ -85,20 +85,20 @@ do
         
         local acceptedTypes = ''
 
-        if v.Type then
-            if type(v.Type) == 'string' then
-                local _temp = v.Type
-                v.Type = {}
-                v.Type[1] = _temp
-                acceptedTypes = v.Type[1]
-            elseif type(v.Type) == 'table' then
-                for t = 1, #v.Type, 1 do
-                    acceptedTypes = acceptedTypes..v.Type[t]..', '
-                    if v.Type[t] == 'all' then
-                        table.wipe(v.Type)
-                        v.Type = {}
-                        v.Type[1] = 'all'
-                        acceptedTypes = v.Type[1]
+        if v.Category then
+            if type(v.Category) == 'string' then
+                local _temp = v.Category
+                v.Category = {}
+                v.Category[1] = _temp
+                acceptedTypes = v.Category[1]
+            elseif type(v.Category) == 'table' then
+                for t = 1, #v.Category, 1 do
+                    acceptedTypes = acceptedTypes..v.Category[t]..', '
+                    if v.Category[t] == 'all' then
+                        table.wipe(v.Category)
+                        v.Category = {}
+                        v.Category[1] = 'all'
+                        acceptedTypes = v.Category[1]
                         break
                     end
                 end
@@ -110,9 +110,9 @@ do
                 end
             end
         else
-            v.Type = {}
-            v.Type[1] = 'all'
-            acceptedTypes = v.Type[1]
+            v.Category = {}
+            v.Category[1] = 'all'
+            acceptedTypes = v.Category[1]
         end
 
         points[zone] = {point = zone:getCenter(), zone = v, isInZone = false, accepted_types = acceptedTypes, type = 'sell'}
@@ -127,7 +127,7 @@ do
     end
 end
 
-function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition, testDrive, isBuyable)
+function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosition, deliveryPosition, testDrive, isBuyable, typeOfVehicle)
     Core.TriggerServerCallback('JLRP-VehicleShop:getVehiclesAndCategories', function(result)
 		vehicles = result.vehicles
         categories = result.categories
@@ -237,6 +237,7 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
         }, function(data2, menu2)
 			if data2.current.value == 'yes' then
                 if isBuyable == true then
+					local plate = GeneratePlate()
                     Core.TriggerServerCallback('JLRP-VehicleShop:buyVehicle', function(result)
                         if result.success == true then
                             isInShopMenu = false
@@ -254,7 +255,7 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
                         else
                             Notification('error', _U('not_enough_money'), {shop_name = shopName})
                         end
-                    end, vehicleData.model)
+                    end, vehicleData.model, typeOfVehicle, plate)
                 else
                     Notification('info', _U('not_buyable'), {shop_name = shopName})
                 end
@@ -459,9 +460,9 @@ function RunThread()
                                 end
                                 if IsControlJustReleased(0, 38) and not IsPedFatallyInjured(PlayerPed) then
                                     if v.type == 'shop' then
-                                        OpenShopMenu(v.zone.Type, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition, v.zone.TestDrive, v.zone.Buyable)
+                                        OpenShopMenu(v.zone.Category, v.zone.InsideShopPosition, v.zone.ShopName, v.zone.MarkerPosition, v.zone.DeliveryPosition, v.zone.TestDrive, v.zone.Buyable, v.zone.Type)
                                     elseif v.type == 'sell' then
-                                        OpenSellMenu(v.zone.Type, v.accepted_types, v.zone.ResellPercentage)
+                                        OpenSellMenu(v.zone.Category, v.accepted_types, v.zone.ResellPercentage)
                                     end     
                                 end
                             else

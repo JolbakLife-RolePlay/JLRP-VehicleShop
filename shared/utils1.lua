@@ -6,27 +6,31 @@ RESOURCENAME = GetCurrentResourceName()
 if IsDuplicityVersion() then -- Only register the body of else in server
 
     function isPlateTaken(plate)
-        local result = MySQL.scalar.await('SELECT plate FROM owned_vehicles WHERE plate = ?', {plate})
-        return (result ~= nil)
+        --local result = MySQL.scalar.await('SELECT plate FROM owned_vehicles WHERE plate = ?', {plate})
+        --return (result ~= nil)
+		
+		MySQL.scalar('SELECT plate FROM owned_vehicles WHERE plate = ?', {plate}, function(result)
+			return (result ~= nil and true or false)
+		end)
     end
 
-    function InsertInDatabase(xPlayer, plate, vehicle)
+    function InsertInDatabase(xPlayer, plate, vehicle, type)
         local response = false
         if FRAMEWORKNAME == 'JLRP-Framework' then
             local id = MySQL.insert.await('INSERT INTO owned_vehicles (owner, owner_identifier, plate, vehicle, type) VALUES (?, ?, ?, ?, ?)', {
                 xPlayer.citizenid,
                 xPlayer.identifier,
                 plate,
-                json.encode({model = vehicle.model, plate = plate}),
-                vehicle.category
+                json.encode({model = GetHashKey(vehicle.model), modelName = vehicle.model, plate = plate}),
+                type
             })
             if id then response = true end
         elseif FRAMEWORKNAME == 'es_extended' then
             local id = MySQL.insert.await('INSERT INTO owned_vehicles (owner, plate, vehicle, type) VALUES (?, ?, ?, ?)', {
                 xPlayer.identifier,
                 plate,
-                json.encode({model = vehicle.model, plate = plate}),
-                vehicle.category
+                json.encode({model = GetHashKey(vehicle.model), modelName = vehicle.model, plate = plate}),
+                type
             })
             if id then response = true end
         end
@@ -40,7 +44,7 @@ if IsDuplicityVersion() then -- Only register the body of else in server
             local result = MySQL.single.await('SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?', {xPlayer.citizenid, plate})
             if result then -- does the owner match?
                 local vehicle = json.decode(result.vehicle)
-                if GetHashKey(vehicle.model) == model then
+                if vehicle.model == model then
                     if vehicle.plate == plate then
                         response = true
                     else
@@ -56,7 +60,7 @@ if IsDuplicityVersion() then -- Only register the body of else in server
             local result = MySQL.single.await('SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?', {xPlayer.identifier, plate})
             if result then -- does the owner match?
                 local vehicle = json.decode(result.vehicle)
-                if GetHashKey(vehicle.model) == model then
+                if vehicle.model == model then
                     if vehicle.plate == plate then
                         response = true
                     else

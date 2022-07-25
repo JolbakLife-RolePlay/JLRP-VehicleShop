@@ -40,16 +40,16 @@ Core.RegisterServerCallback('JLRP-VehicleShop:isPlateTaken', function(source, cb
 	cb(isPlateTaken(plate))
 end)
 
-Core.RegisterServerCallback('JLRP-VehicleShop:buyVehicle', function(source, cb, model)
+Core.RegisterServerCallback('JLRP-VehicleShop:buyVehicle', function(source, cb, model, type, plate)
 	local xPlayer = Core.GetPlayerFromId(source)
     local vehicle = getVehicleFromModel(model)
 	local modelPrice = vehicle.price
-    local plate = GeneratePlate()
+    --local plate = GeneratePlate()
 
 	if modelPrice and xPlayer.getMoney() >= modelPrice then
 		xPlayer.removeMoney(modelPrice)
 
-		local response = InsertInDatabase(xPlayer, plate, vehicle)
+		local response = InsertInDatabase(xPlayer, plate, vehicle, type)
         cb({success = response, plate = plate})
 	else
 		cb({success = false})

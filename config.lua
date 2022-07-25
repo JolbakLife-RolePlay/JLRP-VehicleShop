@@ -21,7 +21,8 @@ Config.TransferVehicle = {
 Config.Zones = {
     Shops = {
         {
-            Type = {'compacts', 'coupes', 'muscle', 'offroad', 'sedans', 'sports', 'sportsclassics', 'super', 'suvs', 'vans'},
+            Category = {'compacts', 'coupes', 'muscle', 'offroad', 'sedans', 'sports', 'sportsclassics', 'super', 'suvs', 'vans'},
+            Type = 'car',
             ShopName = 'Original Vehicle Shop',
             MarkerPosition = {x = -33.7, y = -1102.0, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -43,7 +44,8 @@ Config.Zones = {
 			Buyable = true
         },
         {
-            Type = {'bikes', 'motorcycles', 'quadbikes'},
+            Category = {'bikes', 'motorcycles', 'quadbikes'},
+            Type = 'car',
             ShopName = 'Original Motor Shop',
             MarkerPosition = {x = -43.4, y = -1104.8, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -65,7 +67,8 @@ Config.Zones = {
 			Buyable = true
         },
         {
-            Type = {'vip_rollsroyce'},
+            Category = {'vip_rollsroyce'},
+            Type = 'car',
             ShopName = 'Rolls Royce Shop',
             MarkerPosition = {x = -1169.80, y = -730.18, z = 21.04},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -87,7 +90,8 @@ Config.Zones = {
 			Buyable = false
         },
         {
-            Type = {'vip_audi', 'vip_bentley', 'vip_bmw', 'vip_bugatti', 'vip_chevrolet', 'vip_ferrari', 'vip_ford', 'vip_koenigsegg', 'vip_lamborghini', 'vip_mclaren', 'vip_mercedesbenz', 'vip_nissan', 'vip_porsche', 'vip_tesla'},
+            Category = {'vip_audi', 'vip_bentley', 'vip_bmw', 'vip_bugatti', 'vip_chevrolet', 'vip_ferrari', 'vip_ford', 'vip_koenigsegg', 'vip_lamborghini', 'vip_mclaren', 'vip_mercedesbenz', 'vip_nissan', 'vip_porsche', 'vip_tesla'},
+            Type = 'car',
             ShopName = 'VIP Vehicle Shop',
             MarkerPosition = {x = 205.49, y = -179.11, z = 54.60},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -109,7 +113,8 @@ Config.Zones = {
 			Buyable = false
         },
         {
-            Type = {'persian_citroen', 'persian_ikco', 'persian_nissan', 'persian_peugeot', 'persian_saipa'},
+            Category = {'persian_citroen', 'persian_ikco', 'persian_nissan', 'persian_peugeot', 'persian_saipa'},
+            Type = 'car',
             ShopName = 'Persian Vehicle Shop',
             MarkerPosition = {x = 1225.33, y = 2739.16, z = 37.99},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -131,7 +136,8 @@ Config.Zones = {
 			Buyable = true
         },
         {
-            Type = {'astonmartin', 'audi', 'bmw', 'chevrolet', 'dodge', 'ferrari', 'ford', 'honda', 'hyundai', 'jeep', 'kia', 'koenigsegg', 'lamborghini', 'lexus', 'mazda', 'mclaren', 'mercedesbenz', 'mini', 'mitsubishi', 'nissan', 'peugeot', 'porsche', 'subaru', 'tesla', 'toyota'},
+            Category = {'astonmartin', 'audi', 'bmw', 'chevrolet', 'dodge', 'ferrari', 'ford', 'honda', 'hyundai', 'jeep', 'kia', 'koenigsegg', 'lamborghini', 'lexus', 'mazda', 'mclaren', 'mercedesbenz', 'mini', 'mitsubishi', 'nissan', 'peugeot', 'porsche', 'subaru', 'tesla', 'toyota'},
+            Type = 'car',
             ShopName = 'Real Vehicle Shop',
             MarkerPosition = {x = -798.12, y = -210.17, z = 37.06},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -153,7 +159,8 @@ Config.Zones = {
 			Buyable = true
         },
         {
-            Type = {'drift'},
+            Category = {'drift'},
+            Type = 'car',
             ShopName = 'Drift Vehicle Shop',
             MarkerPosition = {x = -218.10, y = -289.50, z = 50.12},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
@@ -176,7 +183,8 @@ Config.Zones = {
         },
         --[[
         {
-            Type = {'motorcycles', 'bikes'}, -- category of vehicles to buy || valid values => 'category' or 'all' or {'category1', 'category2', etc} or {'all'}
+            Category = {'motorcycles', 'bikes'}, -- category of vehicles to buy || valid values => 'category' or 'all' or {'category1', 'category2', etc} or {'all'}
+            Type = 'car', -- accepted values: 'car' or 'boat' or 'aircraft' 
             ShopName = 'Original Motor Shop', -- name of the shop
             MarkerPosition = {x = -43.4, y = -1104.8, z = 26.4}, -- position of the shop marker to enter the shop menu
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0}, -- size of the shop marker to enter the shop menu
@@ -202,7 +210,7 @@ Config.Zones = {
 
     SellZones = {
         {
-            Type = {'compacts', 'coupes', 'muscle', 'offroad', 'sedans', 'sports', 'sportsclassics', 'super', 'suvs', 'vans'},
+            Category = {'compacts', 'coupes', 'muscle', 'offroad', 'sedans', 'sports', 'sportsclassics', 'super', 'suvs', 'vans'},
             MarkerPosition = {x = -36.29, y = -1088.59, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
@@ -216,7 +224,7 @@ Config.Zones = {
             ResellPercentage = 40
         },
         {
-            Type = {'motorcycles', 'quadbikes'},
+            Category = {'motorcycles', 'quadbikes'},
             MarkerPosition = {x = -29.28, y = -1092.47, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
@@ -230,7 +238,7 @@ Config.Zones = {
             ResellPercentage = 40
         },
         {
-            Type = {'bikes'},
+            Category = {'bikes'},
             MarkerPosition = {x = -27.71, y = -1089.37, z = 26.4},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
@@ -244,7 +252,7 @@ Config.Zones = {
             ResellPercentage = 40
         },
         {
-            Type = {'persian_citroen', 'persian_ikco', 'persian_nissan', 'persian_peugeot', 'persian_saipa'},
+            Category = {'persian_citroen', 'persian_ikco', 'persian_nissan', 'persian_peugeot', 'persian_saipa'},
             MarkerPosition = {x = 1213.01, y = 2731.91, z = 38.00},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
@@ -258,7 +266,7 @@ Config.Zones = {
             ResellPercentage = 40
         },
         {
-            Type = {'astonmartin', 'audi', 'bmw', 'chevrolet', 'dodge', 'ferrari', 'ford', 'honda', 'hyundai', 'jeep', 'kia', 'koenigsegg', 'lamborghini', 'lexus', 'mazda', 'mclaren', 'mercedesbenz', 'mini', 'mitsubishi', 'nissan', 'peugeot', 'porsche', 'subaru', 'tesla', 'toyota'},
+            Category = {'astonmartin', 'audi', 'bmw', 'chevrolet', 'dodge', 'ferrari', 'ford', 'honda', 'hyundai', 'jeep', 'kia', 'koenigsegg', 'lamborghini', 'lexus', 'mazda', 'mclaren', 'mercedesbenz', 'mini', 'mitsubishi', 'nissan', 'peugeot', 'porsche', 'subaru', 'tesla', 'toyota'},
             MarkerPosition = {x = -774.00, y = -226.59, z = 37.1},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
@@ -272,7 +280,7 @@ Config.Zones = {
             ResellPercentage = 40
         },
         {
-            Type = {'drift'},
+            Category = {'drift'},
             MarkerPosition = {x = -199.78, y = -276.43, z = 48.94},         
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0},
             MarkerRGB = {r = 255, g = 0, b = 0},
@@ -287,7 +295,7 @@ Config.Zones = {
         },
         --[[
         {
-            Type = {'vans', 'suv', 'offroad'}, -- category of vehicles to sell || valid values => 'category' or 'all' or {'category1', 'category2', etc} or {'all'}
+            Category = {'vans', 'suv', 'offroad'}, -- category of vehicles to sell || valid values => 'category' or 'all' or {'category1', 'category2', etc} or {'all'}
             MarkerPosition = {x = -27.71, y = -1089.37, z = 26.4}, -- position of the marker to enter the sell menu
             MarkerSize = {x = 1.5, y = 1.5, z = 1.0}, -- size of the marker to enter the sell menu
             MarkerRGB = {r = 255, g = 0, b = 0}, -- color of the marker to enter the sell menu
