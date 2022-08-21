@@ -244,14 +244,16 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
                             menu2.close()
                             menu.close()
                             DeleteDisplayVehicle()
-                            
+                            Wait(100)
                             Core.Game.SpawnVehicle(vehicleData.model, vec(deliveryPosition.x, deliveryPosition.y, deliveryPosition.z), deliveryPosition.h, function(vehicle)
-                                TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-                                SetVehicleNumberPlateText(vehicle, result.plate)
-                                SetPlayerVisible(true)
+                                if vehicle then
+                                    TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+                                    SetVehicleNumberPlateText(vehicle, plate)
+                                    SetPlayerVisible(true)
+                                end
                             end)
 
-                            Notification('success', _U('purchase_successful', vehicleData.name, result.plate), {shop_name = shopName})
+                            Notification('success', _U('purchase_successful', vehicleData.name, plate), {shop_name = shopName})
                         else
                             Notification('error', _U('not_enough_money'), {shop_name = shopName})
                         end
@@ -266,17 +268,20 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 				menu2.close()
 				menu.close()
 				DeleteDisplayVehicle()
+                Wait(100)
                 SetPlayerVisible(true)
                 SetEntityCoords(playerPed, vec(testDrive.Position.x, testDrive.Position.y, testDrive.Position.z))		
-				Core.Game.SpawnVehicle(vehicleData.model, vec(testDrive.Position.x, testDrive.Position.y, testDrive.Position.z), testDrive.Position.h, function(vehicle)			
-					SetVehicleNumberPlateText(vehicle, 'TEST')
-                    TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-                    Notification('info', _U('test_drive_began', testDrive.Time), {timeout = 5000})
-                    ProgressBar(_U('test_drive_progress'), testDrive.Time)
-                    Notification('info', _U('test_drive_finished', testDrive.Time), {timeout = 5000})
-                    isTestDriving = false
-					Core.Game.DeleteVehicle(vehicle)
-					Core.Game.Teleport(playerPed, vec(markerPosition.x, markerPosition.y, markerPosition.z))
+				Core.Game.SpawnVehicle(vehicleData.model, vec(testDrive.Position.x, testDrive.Position.y, testDrive.Position.z), testDrive.Position.h, function(vehicle)
+                    if vehicle then		
+                        SetVehicleNumberPlateText(vehicle, 'TEST')
+                        TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+                        Notification('info', _U('test_drive_began', testDrive.Time), {timeout = 5000})
+                        ProgressBar(_U('test_drive_progress'), testDrive.Time)
+                        Notification('info', _U('test_drive_finished', testDrive.Time), {timeout = 5000})
+                        isTestDriving = false
+                        Core.Game.DeleteVehicle(vehicle)
+                        Core.Game.Teleport(playerPed, vec(markerPosition.x, markerPosition.y, markerPosition.z))
+                    end
 				end)
             else
 				menu2.close()
@@ -287,6 +292,7 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 	end, function(data, menu)
 		menu.close()
 		DeleteDisplayVehicle()
+        Wait(100)
 		local playerPed = PlayerPedId()
 
 		SetPlayerVisible(true)
@@ -298,27 +304,33 @@ function OpenShopMenu(categoriesToShow, insideShopPosition, shopName, markerPosi
 		local playerPed = PlayerPedId()
 
 		DeleteDisplayVehicle()
+        Wait(100)
 		WaitForVehicleToLoad(vehicleData.model)
 
 		Core.Game.SpawnLocalVehicle(vehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
-            TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-            FreezeEntityPosition(vehicle, true)
+            if vehicle then
+                TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+                FreezeEntityPosition(vehicle, true)
+            end
         end)
 	end)
 
 	DeleteDisplayVehicle()
+    Wait(100)
 	WaitForVehicleToLoad(firstVehicleData.model)
 
 	Core.Game.SpawnLocalVehicle(firstVehicleData.model, vec(insideShopPosition.x, insideShopPosition.y, insideShopPosition.z), insideShopPosition.h, function(vehicle)
-		TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-		FreezeEntityPosition(vehicle, true)
+        if vehicle then
+		    TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+		    FreezeEntityPosition(vehicle, true)
+        end
 	end)
 end
 
 function StartShopRestriction()
     if isShopRestrictionThreadActive == true then return end
     isShopRestrictionThreadActive = true
-	Citizen.CreateThreadNow(function()
+	CreateThread(function()
 		while isInShopMenu do
 			Wait(0)
 			DisableControlAction(0, 75,  true) -- Disable exit vehicle
